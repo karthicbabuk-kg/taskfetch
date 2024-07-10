@@ -1,25 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Container } from 'react-bootstrap';
+import { fetchProducts } from './redux/actions';
+import ProductList from './components/ProductList';
+import SearchBar from './components/SearchBar';
+import StoreProvider from './redux/store';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+const App = () => {
+  const dispatch = useDispatch();
+  const products = useSelector((state) => state.products);
+  const searchTerm = useSelector((state) => state.searchTerm);
+
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
+  const filteredProducts = products.filter(product =>
+    product.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
-}
 
-export default App;
+  return (
+    <Container>
+      <h1 className="my-4">Product List</h1>
+      <SearchBar />
+      <ProductList products={filteredProducts} />
+    </Container>
+  );
+};
+
+const AppWrapper = () => (
+  <StoreProvider>
+    <App />
+  </StoreProvider>
+);
+
+export default AppWrapper;
